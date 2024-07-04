@@ -33,7 +33,9 @@
 
 /************************ DEFINIÇÃO DE SENHA ******************************* */
 
-String senha = "ABC123";  // defina a senha aqui, ela deve conter seis dígitos
+String senha = "ABC123";        // defina a senha aqui, ela deve conter seis dígitos
+String senhaMestra = "321ABC";  // define a senha mestra, use essa senha quando a porta estiver fechada
+int estadoSenha = 0;            // 0: senha padrão; 1: senha mestra
 
 /************************ CONFIGURAÇÕES DISPLAY ******************************* */
 
@@ -102,39 +104,87 @@ void loop() {
     position++;
     delay(10);
 
-    /*if (digito == senha[position]) // verifica se o dígito apertado corresponde ao equivalente da senha
-{
-	position++;
-}
-else { // retorna a leitura para a primeira posição de leitura da senha quando o dígito apertado não corresponde ao correto 
-	position = 0;
-  	lcd.clear();
-  	lcd.setCursor(0,0);
-	lcd.print("ACESSO NEGADO");
-	lcd.setCursor(0,1);
-    lcd.print("Senha incorreta!");
-  	delay(1000);
-    lcd.clear();
-  	flag = 6;
-}*/
-    if (((flag - 6) == tamanho_da_senha) && (palavra != senha)) {
-      position = 0;
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("ACESSO NEGADO");
-      lcd.setCursor(0, 1);
-      lcd.print("Senha incorreta!");
-      delay(1000);
-      lcd.clear();
-      flag = 6;
-      palavra = "";
-    }
-    if (((flag - 6) == position) && (palavra == senha))  // altera estado da porta
-    {
 
-      estadoPorta(false);
+    if (estadoSenha == 0) { //
+      if (((flag - 6) == position) && (palavra == senhaMestra))  // altera estado da porta
+      {
+        estadoSenha = 1; // acesso restrito ativado
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO RESTRITO");
+        lcd.setCursor(0, 1);
+        lcd.print("ATIVADO!");
+        delay(1000);
+        lcd.clear();
+        flag = 6;
+        palavra = "";
+        position = 0;
+      }
+      if (((flag - 6) == tamanho_da_senha) && (palavra != senha)) {
+        position = 0;
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO NEGADO");
+        lcd.setCursor(0, 1);
+        lcd.print("Senha incorreta!");
+        delay(1000);
+        lcd.clear();
+        flag = 6;
+        palavra = "";
+      }
+      if (((flag - 6) == position) && (palavra == senha))  // altera estado da porta
+      {
+        estadoPorta(false);
+      }
+      delay(100);
     }
-    delay(100);
+    else
+    {
+      if (((flag - 6) == position) && (palavra == senha))  // altera estado da porta
+      {
+        position = 0;
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO NEGADO");
+        lcd.setCursor(0, 1);
+        lcd.print("SENHA PADRAO");
+        delay(1000);
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO RESTRITO");
+        lcd.setCursor(0, 1);
+        lcd.print("USE SENHA MESTRA!");
+        delay(1500);
+        flag = 6;
+        palavra = "";
+        lcd.clear();
+      }
+      if (((flag - 6) == tamanho_da_senha) && (palavra != senhaMestra)) {
+        position = 0;
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO NEGADO");
+        lcd.setCursor(0, 1);
+        lcd.print("Senha Mestra incorreta!");
+        delay(1000);
+        lcd.clear();
+        flag = 6;
+        palavra = "";
+      }
+      if (((flag - 6) == position) && (palavra == senhaMestra))  // altera estado da porta
+      {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("ACESSO RESTRITO");
+        lcd.setCursor(0, 1);
+        lcd.print("DESATIVADO!");
+        delay(1000);
+        lcd.clear();
+        estadoSenha = 0; // acesso restrito desativado
+        estadoPorta(false);
+      }
+      delay(100);
+    }
   }
 }
 
