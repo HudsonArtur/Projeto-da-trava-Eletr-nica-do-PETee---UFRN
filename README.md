@@ -4,7 +4,7 @@ Este projeto consiste na implementação de uma trava eletrônica desenvolvida p
 ## Funcionalidades
 - **Controle de Acesso:** permite o controle de acesso a um ambiente através de uma senha.
 - **Mecanismo de Travamento:** utiliza componentes eletrônicos e microcontroladores para travar a destravar a porta.
-- **Interface de Usuário:** possui uma interface intuitiva para interação com o usuário, por meio de display LED e um teclado de membrana.
+- **Interface de Usuário:** possui uma interface intuitiva para interação com o usuário, por meio de um display LED e um teclado de membrana.
 - **Segurança:** possui implementação de uma senha master para proteger contra acesso não autorizado e manipulação indevida, tais quais fora de horário do funcionamento do PETee.
 - **Documentação:** possui documentação detalhada sobre o projeto, esquemáticos, diagramas e instruções de montagem e uso.
 
