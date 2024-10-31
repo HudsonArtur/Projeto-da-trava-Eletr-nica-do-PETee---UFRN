@@ -69,6 +69,9 @@ int ledVermelho = 12;
 int ledVerde = 13;
 int releFechadura = 3;  //led azul substituir por módulo relé
 int tempoAberto = 2000;
+int botao = 2; // declara o push button na porta 2
+int tentativas = 2; // tentativas para abrir a porta
+int aviso = 0;
 
 /***************************************************************************** */
 
@@ -81,6 +84,8 @@ void setup() {
 
   estadoPorta(true);  // diz se a porta está ou não trancada
 
+  pinMode(botao, INPUT_PULLUP); // define o pino do botao como entrada
+  
   pinMode(ledVermelho, OUTPUT);
   pinMode(ledVerde, OUTPUT);
   pinMode(releFechadura, OUTPUT);
@@ -94,7 +99,41 @@ void loop() {
   lcd.print("SENHA:");
 
   char digito = keypad.getKey();  // faz a leitura das teclas
-
+  
+  if (digitalRead(botao) == LOW) // Se o botão for pressionado
+  {
+  	estadoPorta(false);
+  }
+  if(estadoSenha == 0){
+    if(tentativas == 1 && aviso == 0){ // AVISO SOBRE AS TENTATIVAS
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("ULTIMA TENTATIVA!");
+          lcd.setCursor(0, 1);
+          lcd.print("ANTES DE ACIONAR");
+          delay(1000);
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("ACESSO RESTRITO!");
+          lcd.setCursor(0, 1);
+          lcd.print("CUIDADO!!");
+          delay(1000);
+          lcd.clear();
+          aviso = 1;
+    }
+    if(tentativas == 0 && aviso == 1){ // Número de tentavias máxima atingida
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("ACIONANDO");
+      lcd.setCursor(0, 1);
+      lcd.print("ACESSO RESTRITO!");
+      delay(1000);
+      lcd.clear();
+      palavra = "";
+      estadoSenha = 1;
+      aviso = 2;
+    }
+  }
   if (digito != 0) {
     Serial.println(digito);  // Imprime a tecla pressionada na porta serial
     lcd.setCursor(flag, 1);
@@ -103,10 +142,10 @@ void loop() {
     palavra += digito;
     position++;
     delay(10);
-
-
-    if (estadoSenha == 0) { //
-      if (((flag - 6) == position) && (palavra == senhaMestra))  // altera estado da porta
+    
+    if (estadoSenha == 0) {
+	  
+      if (((flag - 6) == position) && (palavra == senhaMestra) && (tentativas > 0))  // altera estado da porta
       {
         estadoSenha = 1; // acesso restrito ativado
         lcd.clear();
@@ -122,6 +161,7 @@ void loop() {
       }
       if (((flag - 6) == tamanho_da_senha) && (palavra != senha)) {
         position = 0;
+        tentativas -= 1;
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("ACESSO NEGADO");
@@ -140,7 +180,7 @@ void loop() {
     }
     else
     {
-      if (((flag - 6) == position) && (palavra == senha))  // altera estado da porta
+      if (((flag - 6) == position) && (palavra == senha))  // avisa sobre a senha padrão
       {
         position = 0;
         lcd.clear();
@@ -165,7 +205,7 @@ void loop() {
         lcd.setCursor(0, 0);
         lcd.print("ACESSO NEGADO");
         lcd.setCursor(0, 1);
-        lcd.print("Senha Mestra incorreta!");
+        lcd.print("SENHA INCORRETA!");
         delay(1000);
         lcd.clear();
         flag = 6;
@@ -215,6 +255,9 @@ void estadoPorta(int trancado) {
     lcd.clear();
     flag = 6;
     palavra = "";
+    
+    tentativas = 2;
+    aviso = 0;
 
     estadoPorta(true);  // tranca a porta novamente
   }
